@@ -2,8 +2,31 @@
 # vi: set ft=ruby :
 #
 
-NUM_OF_MANAGERS=3
-NUM_OF_WORKERS=1
+require 'getoptlong'
+
+opts = GetoptLong.new(
+      [ '--managers', GetoptLong::OPTIONAL_ARGUMENT ],
+      [ '--workers', GetoptLong::OPTIONAL_ARGUMENT ]
+)
+
+numOfManagers=1
+numOfWorkers=3
+
+opts.each do |opt, arg|
+  case opt
+    when '--managers'
+      numOfManagers=arg.to_i
+    when '--workers'
+      numOfWorkers=arg.to_i
+  end
+end
+
+puts <<-EOD
+Starting Docker Swarm mode.
+Managers: #{numOfManagers}
+Workers : #{numOfWorkers} 
+
+EOD
 
 @initManager = <<EOD
 echo Arguments: $*
@@ -30,17 +53,17 @@ EOD
 Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/trusty64"
 
-  (1..NUM_OF_MANAGERS).each do |mgrNumber|
+  (1..numOfManagers).each do |mgrNumber|
       config.vm.define "swarm-manager-#{mgrNumber}" do |node|
           node.vm.hostname = "swarm-manager-#{mgrNumber}"
           node.vm.network "private_network", ip: "192.168.50.#{99+mgrNumber}"
           node.vm.provision "shell", inline: "sudo apt-get update"
           node.vm.provision "docker"
-          node.vm.provision "shell", inline: @initManager, args: [ "#{NUM_OF_MANAGERS}" , "192.168.50.#{99+mgrNumber}" ]
+          node.vm.provision "shell", inline: @initManager, args: [ "#{numOfManagers}" , "192.168.50.#{99+mgrNumber}" ]
       end
   end
 
-  (1..NUM_OF_WORKERS).each do |workerNumber|
+  (1..numOfWorkers).each do |workerNumber|
     config.vm.define "swarm-worker-#{workerNumber}" do |node|
       node.vm.hostname = "swarm-worker-#{workerNumber}"
       node.vm.network "private_network", ip: "192.168.50.#{149+workerNumber}"
