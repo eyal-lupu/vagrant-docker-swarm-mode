@@ -2,7 +2,10 @@
 # vi: set ft=ruby :
 #
 
+# Set below the number of managers in your Swarm cluster
 NUM_OF_MANAGERS=1
+
+# Set below the number of workers in your Swarm custer
 NUM_OF_WORKERS=1
 
 @initManager = <<EOD
