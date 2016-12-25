@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 #
 
-NUM_OF_MANAGERS=3
+NUM_OF_MANAGERS=1
 NUM_OF_WORKERS=1
 
 @initManager = <<EOD
